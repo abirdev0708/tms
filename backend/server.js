@@ -4,6 +4,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const tasksRouter = require('./routes/tasks');
+const usersRouter = require('./routes/users');
+const userRoleRouter = require('./routes/userrole');
+
+
 const db = require('./config/db');
 
 const app = express();
@@ -12,6 +16,10 @@ app.use(bodyParser.json());
 
 app.get('/', (req, res) => res.json({ status: 'ok', service: 'tms-backend' }));
 app.use('/api/tasks', tasksRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/userrole', userRoleRouter);
+
+
 
 const PORT = process.env.PORT || 3001;
 
