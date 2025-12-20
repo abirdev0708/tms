@@ -13,7 +13,7 @@ exports.getUserRole = async (req, res) => {
 
 exports.createUserRole = async (req, res) => {
   const payload = req.body || {};
-  const created = await User.create({
+  const created = await UserRole.create({
     roleName: payload.roleName || 'Untitled'
   });
   res.status(201).json(created);

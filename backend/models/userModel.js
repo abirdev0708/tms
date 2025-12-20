@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema({
   emailId: { type: String, default: '' },
   userName: { type: String, default: '' },
   status: { type: String, default: statusEnum.active},
-  roleId: { type: ObjectId},
+  roleId: { type: mongoose.Schema.Types.ObjectId, ref: 'UserRole' },
   description : {type: String, default: '' }
 }, { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } });
 
