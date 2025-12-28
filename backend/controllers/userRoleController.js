@@ -1,8 +1,8 @@
 const UserRole = require('../models/userRoleModel');
 
 exports.userRoleList = async (req, res) => {
-  const UserRole = await UserRole.find().sort({ createdAt: -1 }).lean();
-  res.json(UserRole);
+  const roleList = await UserRole.find().sort({ createdAt: -1 }).lean();
+  res.json(roleList);
 };
 
 exports.getUserRole = async (req, res) => {
