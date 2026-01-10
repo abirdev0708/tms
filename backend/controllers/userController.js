@@ -1,12 +1,29 @@
 const User = require('../models/userModel');
 
 exports.userList = async (req, res) => {
-  const users = await User.find().sort({ createdAt: -1 }).lean();
+    const { firstname } = req.query;
+    console.log("req.query====>",req.query);
+    let users=null;
+   if(firstname){
+        console.log("firstname====>",firstname);
+
+      users = await User.find({
+        firstName: { $regex: firstname?.trim(), $options: "i" },
+      }).sort({ createdAt: -1 }).lean();
+  }
+  else{
+      users = await User.find().sort({ createdAt: -1 }).lean();
+  }
   res.json(users);
 };
 
 exports.getUser = async (req, res) => {
-  const u = await User.findById(req.params.id).lean();
+  const { firstname } = req.query;
+  if(req.params.id){
+      let  u = await User.findById(req.params.id).lean();
+  }
+ 
+  
   if (!u) return res.status(404).json({ error: 'Not found' });
   res.json(u);
 };
