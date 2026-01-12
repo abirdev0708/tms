@@ -1,15 +1,49 @@
 const User = require('../models/userModel');
 
+
+function isContinuousSubArray(arr, sub) {
+  for (let i = 0; i <= arr.length - sub.length; i++) {
+    let match = true;
+
+    for (let j = 0; j < sub.length; j++) {
+      if (arr[i + j] !== sub[j]) {
+        match = false;
+        break;
+      }
+    }
+
+    if (match) return true;
+  }
+  return false;
+}
+
 exports.userList = async (req, res) => {
     const { firstname } = req.query;
-    console.log("req.query====>",req.query);
-    let users=null;
-   if(firstname){
-        console.log("firstname====>",firstname);
+    let fields = Object.keys(User.schema.paths);
+   
+    fields = Object.keys(User.schema.paths).filter((field) => !["_id", "__v"].includes(field));
+  //const isEmpty = Object.keys(fields).length === 0; 
+   console.log("fields====>",fields);
+       console.log("req===>",req.query);
 
-      users = await User.find({
-        firstName: { $regex: firstname?.trim(), $options: "i" },
-      }).sort({ createdAt: -1 }).lean();
+    let users=null;
+
+     // const reqKeys  = Object.keys(req.query);
+              //const obj = {};
+
+     // if(isContinuousSubArray(fields,reqKeys)){
+   const obj = Object.entries(req.query).reduce((acc, [key, value]) => {
+    console.log("[key, value]===>",[key, value])
+  if (value !== undefined && fields.includes(key)) {
+    acc[key]=value.trim();
+  }
+  return acc;
+}, {});
+    //  }
+console.log("obj====>",obj);
+ if(Object.keys(obj).length !== 0){
+  console.log(1);
+      users = await User.find(obj).sort({ createdAt: -1 }).lean();
   }
   else{
       users = await User.find().sort({ createdAt: -1 }).lean();
