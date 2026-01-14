@@ -18,32 +18,23 @@ function isContinuousSubArray(arr, sub) {
 }
 
 exports.userList = async (req, res) => {
-    const { firstname } = req.query;
-    let fields = Object.keys(User.schema.paths);
-   
-    fields = Object.keys(User.schema.paths).filter((field) => !["_id", "__v"].includes(field));
-  //const isEmpty = Object.keys(fields).length === 0; 
-   console.log("fields====>",fields);
-       console.log("req===>",req.query);
+  const { firstname } = req.query;
+  let fields = Object.keys(User.schema.paths); 
+  fields = Object.keys(User.schema.paths).filter((field) => !["_id", "__v"].includes(field));
+  let users=null;
+   const orConditions = Object.entries(req.query)
+  .filter(([key, value]) => value && fields.includes(key))
+  .map(([key, value]) => ({
+    [key]: {
+      $regex: String(value).trim(),
+      $options: "i",
+    },
+  }));
 
-    let users=null;
+  const query = orConditions.length ? { $or: orConditions } : {};
 
-     // const reqKeys  = Object.keys(req.query);
-              //const obj = {};
-
-     // if(isContinuousSubArray(fields,reqKeys)){
-   const obj = Object.entries(req.query).reduce((acc, [key, value]) => {
-    console.log("[key, value]===>",[key, value])
-  if (value !== undefined && fields.includes(key)) {
-    acc[key]=value.trim();
-  }
-  return acc;
-}, {});
-    //  }
-console.log("obj====>",obj);
- if(Object.keys(obj).length !== 0){
-  console.log(1);
-      users = await User.find(obj).sort({ createdAt: -1 }).lean();
+ if(Object.keys(query).length !== 0){
+      users = await User.find(query).sort({ createdAt: -1 }).lean();
   }
   else{
       users = await User.find().sort({ createdAt: -1 }).lean();
