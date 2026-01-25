@@ -17,30 +17,32 @@ function isContinuousSubArray(arr, sub) {
   return false;
 }
 
+/* Safely creates a regex object from user input
+ * Neutralizes characters like: . * + ? ^ $ { } ( ) | [ ] \
+ */
+const safeRegex = (userInput) => {
+  const escaped = String(userInput).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return { $regex: escaped, $options: 'i' };
+};
+
 exports.userList = async (req, res) => {
   try {
-    const { firstname } = req.query;
   let fields = Object.keys(User.schema.paths); 
   fields = Object.keys(User.schema.paths).filter((field) => !["_id", "__v"].includes(field));
   let users=null;
    const orConditions = Object.entries(req.query)
   .filter(([key, value]) => value && fields.includes(key))
   .map(([key, value]) => ({
-    [key]: {
-      $regex: String(value).trim(),
-      $options: "i",
-    },
+    [key]: safeRegex(value)
   }));
 
   const query = orConditions.length ? { $or: orConditions } : {};
 
  if(Object.keys(query).length !== 0){
-      users = await User.find(query).sort({ createdAt: -1 })
-      .maxTimeMS(10).lean();
+      users = await User.find(query).sort({ createdAt: -1 }).lean();
   }
   else{
-      users = await User.find().sort({ createdAt: -1 })
-      .maxTimeMS(10).lean();
+      users = await User.find().sort({ createdAt: -1 }).lean();
   }
   res.status(200).json(users);
   }
